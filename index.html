@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>General Knowledge Quiz</title>
+  <style>
+    /* Reset some */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #4a4a4a;
+      font-weight: 700;
+    }
+
+    .question-number {
+      font-size: 14px;
+      color: #757575;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .question {
+      font-size: 20px;
+      margin-bottom: 25px;
+      color: #222;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0px 20px;
+      
+    }
+
+
+
+
+    button {
+      margin: 20px auto;
+      background-color: #9f6fcfa9;
+      color: white;
+      border: none;
+      padding: 15px 35px;
+      font-size: 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgb(118 75 162 / 0.5);
+      transition: background-color 0.3s ease;
+      
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #663b9a;
+      color: #fff;
+    }
+
+    button:disabled {
+      background-color: #a9a9a9;
+      cursor: not-allowed;
+      box-shadow: none;
+
+    }
+
+    .result {
+      font-size: 22px;
+      font-weight: 700;
+      color: #5d3ebd;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-details {
+      margin-top: 8px;
+      font-size: 16px;
+      color: #666;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #444;
+      background: #f7f7f7;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn:hover {
+      background: #ffffff;
+      border-color: #8a66af8e;
+    }
+
+    .selected {
+      background: #d9cbff;
+
+      font-weight: 700;
+      color: #050505;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="quiz-container" role="main" aria-label="General Knowledge Quiz">
+    <h1>General Knowledge Quiz</h1>
+    <div class="question-number" aria-live="polite"></div>
+    <div class="question" aria-live="polite"></div>
+    <ul class="options" role="list"></ul>
+    <button id="next-btn" disabled>Next</button>
+    <div class="result" aria-live="polite" role="region"></div>
+  </div>
+  <script>
+
+    const questions = [
+      {
+        question: "What is the capital city of Australia?",
+        options: ["Sydney", "Canberra", "Melbourne", "Brisbane"],
+        answer: 1,
+      },
+      {
+        question: "Who wrote the play 'Romeo and Juliet'?",
+        options: ["William Shakespeare", "Charles Dickens", "Jane Austen", "Mark Twain"],
+        answer: 0,
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Venus", "Earth", "Mars", "Jupiter"],
+        answer: 2,
+      },
+      {
+        question: "What is the largest ocean on Earth?",
+        options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean",],
+        answer: 3,
+      },
+      {
+        question: "In which year did the Titanic sink?",
+        options: ["1912", "1905", "1898", "1923"],
+        answer: 0,
+      },
+      {
+        question: "Who painted the Mona Lisa?",
+        options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet",],
+        answer: 2,
+      },
+      {
+        question: "Which is the smallest country in the world?",
+        options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+        answer: 1,
+      },
+      {
+        question: "What currency is used in Japan?",
+        options: ["Yuan", "Yen", "Won", "Dollar"],
+        answer: 1,
+      },
+      {
+        question: "How many continents are there on Earth?",
+        options: ["6", "7", "5", "8"],
+        answer: 1,
+      },
+      {
+        question: "What gas do plants absorb from the atmosphere?",
+        options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+        answer: 2,
+      },
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionNumberEl = document.querySelector(".question-number");
+    const questionEl = document.querySelector(".question");
+    const optionsEl = document.querySelector(".options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.querySelector(".result");
+
+    function loadQuestions() {
+      optionsEl.innerHTML = ""; // Clear previous options
+      questionNumberEl.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      questionEl.textContent = questions[currentQuestion].question;
+      questions[currentQuestion].options.forEach((option) => {
+        let opt = document.createElement("button")
+        opt.innerHTML = option;
+        opt.classList.add("option-btn")
+        
+        optionsEl.appendChild(opt);
+
+        opt.addEventListener("click", (e) => {
+          let selected = e.target;
+          selected.classList.add("selected");
+          btnDisable();
+          nextBtn.disabled = false;
+          checkAns();
+
+        })
+
+      })
+
+    };
+
+
+    function checkAns() {
+      let selected = document.querySelector(".selected");
+      let selectedIndex = Array.from(optionsEl.children).indexOf(selected);
+      if (selectedIndex === questions[currentQuestion].answer) {
+        score++;
+        selected.style.backgroundColor = "#4CAF50"; // Green
+      } else {
+        selected.style.backgroundColor = "#f44336"; // Red
+        optionsEl.children[questions[currentQuestion].answer].style.backgroundColor = "#4CAF50"; // Green for correct answer
+      }
+    }
+    function btnDisable() {
+      let btns = document.querySelectorAll(".option-btn");
+      btns.forEach((btn) => {
+        btn.disabled = true;
+      });
+      
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestions();
+        nextBtn.disabled = true;
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      const scoreCard = document.querySelector(".result");
+      scoreCard.innerHTML = `You scored ${score} out of ${questions.length}`;
+      questionNumberEl.style.display = "none";
+      questionEl.style.display = "none";
+      optionsEl.style.display = "none";
+      nextBtn.style.display = "none";
+      const restartBtn = document.createElement("button");
+      restartBtn.innerHTML = "Restart Quiz";
+      scoreCard.appendChild(restartBtn);
+
+      restartBtn.addEventListener("click", () => {
+        location.reload();
+      });
+    }
+
+
+    // Initialize quiz
+    loadQuestions();
+
+
+
+
+  </script>
+</body>
+
+</html>
